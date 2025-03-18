@@ -1,0 +1,59 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-05-07T12:55:54+00:00",
+    "name": "Sponge (SpongeVanilla)",
+    "author": "support@pterodactyl.io",
+    "description": "SpongeVanilla 是建立在独立的原版 Minecraft 服务端上的 SpongeAPI 实现。",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit"
+    ],
+    "docker_images": {
+        "Java 21": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_21",
+        "Java 16": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_16",
+        "Java 11": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_11",
+        "Java 8": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/ash\r\n# Sponge Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n\r\ncd \/mnt\/server\r\n\r\ncurl -sSL \"https:\/\/repo.spongepowered.org\/maven\/org\/spongepowered\/spongevanilla\/${SPONGE_VERSION}\/spongevanilla-${SPONGE_VERSION}.jar\" -o ${SERVER_JARFILE}",
+            "container": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/installers:alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Sponge 版本",
+            "description": "下载并使用的 SpongeVanilla 版本。",
+            "env_variable": "SPONGE_VERSION",
+            "default_value": "1.12.2-7.3.0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:\/^([a-zA-Z0-9.\\-_]+)$\/",
+            "field_type": "text"
+        },
+        {
+            "name": "服务器 Jar 文件",
+            "description": "运行 SpongeVanilla 时使用的核心文件名称。",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "server.jar",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:\/^([\\w\\d._-]+)(\\.jar)$\/",
+            "field_type": "text"
+        }
+    ]
+}

@@ -1,0 +1,60 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-05-07T12:55:58+00:00",
+    "name": "Vanilla Minecraft",
+    "author": "support@pterodactyl.io",
+    "description": "Minecraft 是一款关于放置积木和进行冒险的游戏。探索随机生成的世界，建造从最简单的房屋到最宏伟的城堡。在创造模式下用无限资源的玩游戏，或在生存模式中深入挖掘，制作武器和盔甲以抵御危险的怪物。独自或与朋友一起探险这个世界吧！",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit"
+    ],
+    "docker_images": {
+        "Java 21": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_21",
+        "Java 17": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_17",
+        "Java 16": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_16",
+        "Java 11": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_11",
+        "Java 8": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/ash\r\n# Vanilla MC Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\nmkdir -p \/mnt\/server\r\ncd \/mnt\/server\r\n\r\nLATEST_VERSION=`curl https:\/\/launchermeta.mojang.com\/mc\/game\/version_manifest.json | jq -r '.latest.release'`\r\nLATEST_SNAPSHOT_VERSION=`curl https:\/\/launchermeta.mojang.com\/mc\/game\/version_manifest.json | jq -r '.latest.snapshot'`\r\n\r\necho -e \"latest version is $LATEST_VERSION\"\r\necho -e \"latest snapshot is $LATEST_SNAPSHOT_VERSION\"\r\n\r\nif [ -z \"$VANILLA_VERSION\" ] || [ \"$VANILLA_VERSION\" == \"latest\" ]; then\r\n  MANIFEST_URL=$(curl -sSL https:\/\/launchermeta.mojang.com\/mc\/game\/version_manifest.json | jq --arg VERSION $LATEST_VERSION -r '.versions | .[] | select(.id== $VERSION )|.url')\r\nelif [ \"$VANILLA_VERSION\" == \"snapshot\" ]; then\r\n  MANIFEST_URL=$(curl -sSL https:\/\/launchermeta.mojang.com\/mc\/game\/version_manifest.json | jq --arg VERSION $LATEST_SNAPSHOT_VERSION -r '.versions | .[] | select(.id== $VERSION )|.url')\r\nelse\r\n  MANIFEST_URL=$(curl -sSL https:\/\/launchermeta.mojang.com\/mc\/game\/version_manifest.json | jq --arg VERSION $VANILLA_VERSION -r '.versions | .[] | select(.id== $VERSION )|.url')\r\nfi\r\n\r\nDOWNLOAD_URL=$(curl ${MANIFEST_URL} | jq .downloads.server | jq -r '. | .url')\r\n\r\necho -e \"running: curl -o ${SERVER_JARFILE} $DOWNLOAD_URL\"\r\ncurl -o ${SERVER_JARFILE} $DOWNLOAD_URL\r\n\r\necho -e \"Install Complete\"",
+            "container": "registry.cn-shanghai.aliyuncs.com\/pterodactyl-china\/installers:alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "服务器 Jar 文件",
+            "description": "用于运行服务器的服务器核心文件名称。",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "server.jar",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:\/^([\\w\\d._-]+)(\\.jar)$\/",
+            "field_type": "text"
+        },
+        {
+            "name": "服务器版本",
+            "description": "要安装的原版 Minecraft 版本。使用 \"latest\" 将安装最新版本，或使用 \"snapshot\" 安装最新快照版本。转到设置 > 重新安装服务器以应用此次更改。",
+            "env_variable": "VANILLA_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|between:3,15",
+            "field_type": "text"
+        }
+    ]
+}
